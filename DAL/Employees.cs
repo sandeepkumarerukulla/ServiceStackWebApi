@@ -2,7 +2,7 @@
 
 namespace DAL
 {
-    public class Employees
+    public class Employee
     {
         [Key]
         public int Id { get; set; }

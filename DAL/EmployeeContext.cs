@@ -8,7 +8,7 @@ namespace DAL
         public EmployeeContext(): base("EmployeeDB")
         { }
 
-        public DbSet<Employees> Employees { get; set; }
+        public DbSet<Employee> Employees { get; set; }
 
     }
 }

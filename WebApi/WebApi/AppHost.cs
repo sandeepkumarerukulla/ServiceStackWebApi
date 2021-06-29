@@ -1,4 +1,5 @@
-﻿using Funq;
+﻿using DAL;
+using Funq;
 using ServiceStack;
 using WebApi.ServiceInterface;
 
@@ -26,6 +27,10 @@ namespace WebApi
             //this.Plugins.Add(new PostmanFeature());
             //this.Plugins.Add(new CorsFeature());
 
+            //container.AddDbContext<EmployeeContext>();
+
+            container.Register<IEmployeeRepository>(new EmployeeRepository());
+            
         }
     }
 } 

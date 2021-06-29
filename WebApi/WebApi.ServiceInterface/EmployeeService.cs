@@ -1,101 +1,85 @@
-﻿using ServiceStack;
+﻿using DAL;
+using ServiceStack;
 using ServiceStack.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using WebApi.ServiceModel;
+using Employees = WebApi.ServiceModel.Employees;
 
 namespace WebApi.ServiceInterface
 {
 
     public class EmployeeService : Service
     {
-        private static List<Employees> _employees = new List<Employees>
-        {
-            new Employees
-                {
-                    Id =1,
-                    Location = "Karnataka",
-                    Name = "Sandeep"
-                },
-        new Employees
-                {
-                    Id =2,
-                    Location = "Delhi",
-                    Name = "Sanjay"
-                }
-        };
+        private readonly IEmployeeRepository employeeRepository;
 
+        public EmployeeService(IEmployeeRepository employeeRepository)
+        {
+            this.employeeRepository = employeeRepository;
+        }
+
+     
         public object Get(Employees employees)
         {
             if ( employees.Id > 0)
             {
-                return _employees.Where(x => x.Id == employees.Id).First();
+                return this.employeeRepository.GetEmployeeById(employees.Id);
             }
-            return _employees;
+            return this.employeeRepository.GetAllEmployees();
         }
 
         public IHttpResult Post(Employees employees)
         {
-            Random rd = new Random();
-
-            if(_employees.Any(x => x.Id == employees.Id)){
-
-                return new HttpResult(System.Net.HttpStatusCode.BadRequest, "Given Employee ID exists, please pass unique Empl ID");
-            }
-
-            _employees.Add(new Employees
+            
+           var emp =  this.employeeRepository.AddEmployee(new DAL.Employee
             {
-                Id = employees.Id,
                 Location = employees.Location,
                 Name = employees.Name
             });
-
-            return new HttpResult(System.Net.HttpStatusCode.OK, "Employee Added Successfully.");
+            if(emp != null)
+                return new HttpResult(System.Net.HttpStatusCode.OK, "Employee Added Successfully.");
+            else
+                return new HttpResult(System.Net.HttpStatusCode.InternalServerError,
+                    " internal server error.");
 
         }
 
         public IHttpResult Put(Employees employees)
         {
-            Random rd = new Random();
+            var emp = this.employeeRepository.GetEmployeeById(employees.Id);
 
-            if (_employees.Any(x => x.Id == employees.Id))
+            if (emp != null)
             {
-                _employees.Remove(_employees.Where(x => x.Id == employees.Id).First());
-
-                _employees.Add(new Employees
+                this.employeeRepository.UpdateEmployee(new DAL.Employee
                 {
                     Id = employees.Id,
                     Location = employees.Location,
                     Name = employees.Name
                 });
+
+                return new HttpResult(System.Net.HttpStatusCode.OK, "Employee Updated Successfully.");
             }
             else
             {
-                return new HttpResult(System.Net.HttpStatusCode.BadRequest, "Given Employee ID exists, please pass unique Empl ID");
-
+                return new HttpResult(System.Net.HttpStatusCode.NotFound, "Employee Not Found.");
             }
-
-
-            return new HttpResult(System.Net.HttpStatusCode.OK, "Employee Updated Successfully.");
-
         }
 
         public IHttpResult Delete(Employees employees)
         {
+            var emp = this.employeeRepository.GetEmployeeById(employees.Id);
            
-            if (_employees.Any(x => x.Id == employees.Id))
+            if (emp != null)
             {
-                var removed = _employees.Remove(_employees.Where(x => x.Id == employees.Id).First());
+                this.employeeRepository.DeleteEmployee(employees.Id);
 
-                return new HttpResult(System.Net.HttpStatusCode.OK);
-
+                return new HttpResult(System.Net.HttpStatusCode.OK, "Removed successfully");
             }
             else
             {
                 return new HttpResult(System.Net.HttpStatusCode.NotFound , "Please pass valid Employee Id");
             }
-
         }
     }
 }

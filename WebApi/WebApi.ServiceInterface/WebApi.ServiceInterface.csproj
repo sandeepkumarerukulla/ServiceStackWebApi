@@ -86,6 +86,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DAL\DAL.csproj">
+      <Project>{9590041D-FA99-404F-A68D-069ABECA5E3E}</Project>
+      <Name>DAL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WebApi.ServiceModel\WebApi.ServiceModel.csproj">
       <Project>{53E82AC1-DD1D-4C66-B55F-F9F4ACFB2F40}</Project>
       <Name>WebApi.ServiceModel</Name>
